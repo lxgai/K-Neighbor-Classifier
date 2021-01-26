@@ -107,27 +107,36 @@ public class part1main {
     public static int predict(int[] vec, ArrayList<Pair<int[],Integer>> trainlist, int kval) {
         
         // store (dist, label) pairs 
-        ArrayList<Pair<Integer,Integer>> distResults = new ArrayList<Pair<Integer,Integer>>();
+        ArrayList<Pair<Double,Integer>> distResults = new ArrayList<Pair<Double,Integer>>();
 
         // for each point of the training data, find its dist between test data
         for (int i = 0; i < trainlist.size(); ++i) {
-            int dis = dist(trainlist.get(i).getKey(), vec);
+            double dis = dist(trainlist.get(i).getKey(), vec);
             // the pair is (DIST between test and training point, LABEL of the training data point)
-            distResults.add(new Pair<Integer,Integer>(dis, trainlist.get(i).getValue()));
+            distResults.add(new Pair<Double,Integer>(dis, trainlist.get(i).getValue()));
         }
 
         return findMajority(distResults, kval);
     }
 
-    public static int findMajority(ArrayList<Pair<Integer,Integer>> distResults, int kval) {
+    public static int findMajority(ArrayList<Pair<Double,Integer>> distResults, int kval) {
         // to update dist counts and get majority
         int[] arr = new int[10];
 
         // sort the (dist, label) pairs by increasing distance
-        Collections.sort(distResults, new Comparator<Pair<Integer, Integer>>() {
+        Collections.sort(distResults, new Comparator<Pair<Double, Integer>>() {
             @Override
-            public int compare(final Pair<Integer, Integer> one, final Pair<Integer, Integer> two) {
-                return one.getKey() - two.getKey();
+            public int compare(final Pair<Double, Integer> one, final Pair<Double, Integer> two) {
+                double tmp = one.getKey() - two.getKey();
+                if (tmp == 0) {
+                    return 0;
+                }
+                else if (tmp < 0) {
+                    return -1;
+                }
+                else {
+                    return 1;
+                }
             }
         });
 
