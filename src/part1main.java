@@ -23,7 +23,7 @@ public class part1main {
             String filename = inRead.nextLine();
 
             File dataset = new File(filename);
-            inRead.close();
+            
 
             // read training set
             Scanner dataRead = new Scanner(dataset);
@@ -42,24 +42,32 @@ public class part1main {
 
                 // put (vector, label) pair into list
                 trainlist.add(new Pair<int[], Integer>(datavec, tmp));
+
+                // PRINT TRAINING DATA
+                //System.out.println("Training data: ");
+                //for (int i = 0; i < trainlist.size(); i++) {
+                   // System.out.println("Vector: " + trainlist.get(i).getKey() + " -- Label: " + trainlist.get(i).getValue() );
+
+                //}
             }
 
             dataRead.close();
-            Scanner inRead2 = new Scanner(System.in);
-
+            
+            
             while (true) {
                 size = 0;
                 errorcnt = 0;
 
-                // read in test file path               
+                // read in test file path     
+                          
                 System.out.println("Enter test file: ");
-                testfile = inRead2.nextLine();
+                testfile = inRead.nextLine();
                 File toTest = new File(testfile);
 
                 // read in k value
                 System.out.println("Enter k value: ");
-                kval = inRead2.nextInt();
-                inRead2.nextLine();
+                kval = inRead.nextInt();
+                inRead.nextLine();
                 
 
                 Scanner testRead = new Scanner(toTest);
@@ -74,8 +82,12 @@ public class part1main {
                         datavec[i] = Integer.parseInt(separate[i]);
                     }
 
+                    
+
                     // the correct label for the data (vector) point
                     int truLabel = Integer.parseInt(separate[separate.length - 1]);
+
+                    
 
                     // attempt to predict the label of the point
                     int predictedLabel = predict(datavec, trainlist, kval);
@@ -92,11 +104,13 @@ public class part1main {
                 System.out.println("Given the file: " + testfile + " and a k-value of: " + kval + ", the error was: " + error);
 
                 System.out.println("Go again? (y/n)"); 
-                if (!inRead2.nextLine().equals("y")) {
+                if (!inRead.nextLine().equals("y")) {
+                    inRead.close();
+                    
                     break;
                 }
             }
-            inRead2.close();
+            
         } catch (FileNotFoundException e) {
             System.out.println("Can't find file.");
         }
@@ -145,10 +159,12 @@ public class part1main {
             arr[distResults.get(i).getValue()]++;
         }
         int maj = 0;
+        int majlabel = 0;
         for (int i = 0; i < 10; ++i) {
             // if the ith label has more than the current majority label, update
             if (arr[i] > maj) {
                 maj = arr[i];
+                majlabel = i;
             }
             // if equal, break tie randomly
             else if (arr[i] == maj) {
@@ -156,7 +172,7 @@ public class part1main {
             }
         }
 
-        return maj;
+        return majlabel;
     }
 
     public static double dist(int[] one, int[] two) {
