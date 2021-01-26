@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 public class part1main {
     public static void main(String[] args) {
@@ -7,6 +8,7 @@ public class part1main {
         // list of training data
         ArrayList<Pair<int[], Integer>> trainlist = new ArrayList<Pair<int[], Integer>>();
 
+        // other elements
         int kval = 0;
         String testfile = "";
         int size = 0;
@@ -26,12 +28,16 @@ public class part1main {
             // read training set
             Scanner dataRead = new Scanner(dataset);
             while (dataRead.hasNextLine()) {
+
+                // obtain data (vector) point
                 String line = dataRead.nextLine();
                 String[] separate = line.split(" ");
                 int[] datavec = new int[separate.length - 1];
                 for (int i = 0; i < separate.length - 1; ++i) {
                     datavec[i] = Integer.parseInt(separate[i]);
                 }
+
+                // obtain label
                 int tmp = Integer.parseInt(separate[separate.length - 1]);
 
                 // put (vector, label) pair into list
@@ -72,7 +78,7 @@ public class part1main {
                     int truLabel = Integer.parseInt(separate[separate.length - 1]);
 
                     // attempt to predict the label of the point
-                    int predictedLabel = predict(datavec);
+                    int predictedLabel = predict(datavec, trainlist, kval);
 
                     if (predictedLabel != truLabel) {
                         errorcnt++;
@@ -98,8 +104,59 @@ public class part1main {
 
     }
 
-    public int distance() {
-        return 0;
+    public static int predict(int[] vec, ArrayList<Pair<int[],Integer>> trainlist, int kval) {
+        
+        // store (dist, label) pairs 
+        ArrayList<Pair<Integer,Integer>> distResults = new ArrayList<Pair<Integer,Integer>>();
+
+        // for each point of the training data, find its dist between test data
+        for (int i = 0; i < trainlist.size(); ++i) {
+            int dis = dist(trainlist.get(i).getKey(), vec);
+            // the pair is (DIST between test and training point, LABEL of the training data point)
+            distResults.add(new Pair<Integer,Integer>(dis, trainlist.get(i).getValue()));
+        }
+
+        return findMajority(distResults, kval);
+    }
+
+    public static int findMajority(ArrayList<Pair<Integer,Integer>> distResults, int kval) {
+        // to update dist counts and get majority
+        int[] arr = new int[10];
+
+        // sort the (dist, label) pairs by increasing distance
+        Collections.sort(distResults, new Comparator<Pair<Integer, Integer>>() {
+            @Override
+            public int compare(final Pair<Integer, Integer> one, final Pair<Integer, Integer> two) {
+                return one.getKey() - two.getKey();
+            }
+        });
+
+        // obtain the k-lowest dist counts and their label
+        for (int i = 0; i < kval; ++i) {
+            arr[distResults.get(i).getValue()]++;
+        }
+        int maj = 0;
+        for (int i = 0; i < 10; ++i) {
+            // if the ith label has more than the current majority label, update
+            if (arr[i] > maj) {
+                maj = arr[i];
+            }
+            // if equal, break tie randomly
+            else if (arr[i] == maj) {
+                maj = new Random().nextBoolean() ? arr[i] : maj;
+            }
+        }
+
+        return maj;
+    }
+
+    public static double dist(int[] one, int[] two) {
+        double sum = 0;
+        
+        for (int i = 0; i < one.length; ++i) {
+            sum = sum + Math.pow( (one[i] - two[i]), 2 );
+        }
+        return Math.sqrt(sum);
     }
 
     // read in training data and put it into an array?? or other data structure
@@ -107,11 +164,10 @@ public class part1main {
     /*
      * method to predict one test data label (one line): 
      *      find distance between test point and all points in training array 
-     *      use dist method in a loop & store (label, dist) pairs in result array 
+     *      use dist method in a loop & store (dist, label) pairs in result array 
      *      find the k lowest distances return the
      * majority label of the k lowest distances findmajority method
-     * https://www.geeksforgeeks.org/sort-an-array-of-pairs-using-java-pair-and-
-     * comparator/ (resolve ties randomly)
+     * https://www.geeksforgeeks.org/sort-an-array-of-pairs-using-java-pair-and-comparator/ (resolve ties randomly)
      * 
      * ------
      * 
@@ -120,6 +176,8 @@ public class part1main {
      * already have overall count)
      * 
      */
+
+
 
     static class Pair<K, V> {
         private K key;
