@@ -66,6 +66,9 @@ public class part1main {
                 System.out.println("Enter k value: ");
                 kval = inRead.nextInt();
                 inRead.nextLine();
+
+                // start calculating runtime
+                long startTime = System.nanoTime();
                 
 
                 Scanner testRead = new Scanner(toTest);
@@ -97,9 +100,14 @@ public class part1main {
 
                 testRead.close();
 
-                // calculate error and tell user
+                // calculate error, runtime and tell user
                 error = (double)errorcnt / size;
+                long stopTime = System.nanoTime();
+
+                System.out.println("Runtime: " + (stopTime - startTime));
                 System.out.println("Given the file: " + testfile + " and a k-value of: " + kval + ", the error was: " + error);
+
+                
 
                 System.out.println("Go again? (y/n)"); 
                 if (!inRead.nextLine().equals("y")) {
